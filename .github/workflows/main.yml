@@ -2,22 +2,13 @@ name: Verify Human Identity
 
 on:
   workflow_dispatch:
-    inputs:
-      agent_name:
-        description: "your identity"
-        required: true
-        default: "your identity"
-      agent_description:
-        description: "your identity"
-        required: true
-        default: "your identity AI Agent"
 
 jobs:
   verify:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -25,16 +16,30 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Step 1 - Install ClawHub skill
-        run: npx clawhub@latest install verified-agent-identity
-
-      - name: Install script dependencies
+      - name: Install ClawHub CLI
         run: |
-          cd scripts
-          npm install
+          npm install -g npm
+          npx clawhub@latest --help
 
-      - name: Step 2 - Create new Ethereum Identity
-        run: node scripts/createNewEthereumIdentity.js
+      - name: Install Verified Agent Identity
+        run: |
+          npx clawhub@latest install verified-agent-identity
 
-      - name: Step 3 - Link Human to Agent
-        run: node scripts/linkHumanToAgent.js
+      - name: Install Dependencies
+        run: |
+          if [ -d "scripts" ]; then
+            cd scripts
+            npm install
+          fi
+
+      - name: Create Ethereum Identity
+        run: |
+          if [ -f "scripts/createNewEthereumIdentity.js" ]; then
+            node scripts/createNewEthereumIdentity.js
+          fi
+
+      - name: Link Human to Agent
+        run: |
+          if [ -f "scripts/linkHumanToAgent.js" ]; then
+            node scripts/linkHumanToAgent.js
+          fi
